@@ -59,24 +59,39 @@ Aplikacja MotoGarage na Androida do zarządzania motocyklami, ich serwisem, wyda
 
 ---
 
-## 🚀 v0.3 Beta — 13.11.2026
-**Usprawnienia interfejsu i historii serwisowej**
+### v0.3.0 — Ulepszenia interfejsu
+- Prace nad położeniem górnego nagłówka.
+- Dostosowanie wyglądu aplikacji do ekranu telefonu.
+- Usprawnienia układu interfejsu.
 
-### Poprawki interfejsu
-- Zmieniono sposób pozycjonowania nagłówka względem systemowego paska Androida.
-- Dostosowano położenie logo, nazwy MotoGarage i przycisku ustawień.
+### v0.3.1 — Nowy wygląd nagłówka
+- Dodano ikonę MotoGarage zamiast emoji.
+- Poprawiono wygląd nazwy aplikacji.
+- Ujednolicono stylistykę nagłówka.
+- Wprowadzono stylizowane okna potwierdzeń.
+- Zachowano obsługę motogodzin i pozostałe funkcje.
 
-### Usprawnienia serwisu
-- Dodano automatyczne pobieranie aktualnego stanu motogodzin wybranego motocykla podczas tworzenia wpisu serwisowego.
-- Zachowano możliwość ręcznej edycji wartości motogodzin.
-- Uwzględniono zmianę motocykla podczas wypełniania formularza.
+### v0.3.2 — Poprawki pasków systemowych
+- Poprawiono obsługę pasków systemowych Androida.
+- Usunięto białą przestrzeń nad nagłówkiem.
+- Dostosowano położenie interfejsu względem paska statusu.
+- Poprawiono układ dolnej nawigacji.
 
-### Techniczne
-- Przygotowano zmiany w kodzie aplikacji i konfiguracji Androida.
-- Zaktualizowano numer wersji do 0.3.
-- Przygotowano nową kompilację testową APK.
+### v0.3.3 — Finalne poprawki interfejsu
+- Usunięto zbędny odstęp pod dolnym menu.
+- Poprawiono położenie zakładek względem systemowego paska nawigacji.
+- Zachowano poprawiony wygląd górnego nagłówka.
+- Przetestowano aplikację na telefonie.
+- Zaakceptowano końcowy wygląd interfejsu.
 
-**Status:** Wymaga końcowego potwierdzenia działania poprawek na telefonie.
+---
+
+**Ostatnia aktualizacja:** 13.11.2026
+
+**Status:** ✅ Wersja przetestowana i zaakceptowana.
+
+**Uwaga:** Numery 0.3.2 i 0.3.3 odnoszą się do kolejnych etapów poprawek. Numer wersji APK może nadal wynosić 0.3.1.
+
 
 ---
 
