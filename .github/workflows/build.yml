@@ -12,7 +12,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: "Moto Garage Android"
+        working-directory: "MotoGarage_Android"
 
     steps:
       - name: Pobierz projekt
@@ -39,5 +39,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: MotoGarage-APK
-          path: "Moto Garage Android/app/build/outputs/apk/debug/*.apk"
+          path: "MotoGarage_Android/app/build/outputs/apk/debug/*.apk"
           if-no-files-found: error
