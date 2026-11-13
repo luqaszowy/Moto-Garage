@@ -1,38 +1,93 @@
-# 🏍️ MotoGarage — v0.1 Alpha
+# 🏍️ MotoGarage — historia wersji
 
-**MotoGarage** to aplikacja na Androida stworzona z myślą o miłośnikach motocykli, motocrossu i enduro. Umożliwia zarządzanie motocyklami, kontrolowanie serwisu, wydatków oraz zapisywanie ulubionych miejsc do jazdy.
+Aplikacja MotoGarage na Androida do zarządzania motocyklami, ich serwisem, wydatkami oraz ulubionymi torami i miejscówkami do jazdy.
 
-## 📱 Główne funkcje — 5 zakładek
+**Aktualna wersja: v0.3 Beta (w trakcie testów)**
 
-### 🏠 1. Start
-Ekran główny aplikacji z podsumowaniem najważniejszych informacji o motocyklu, jego przebiegu i nadchodzących czynnościach serwisowych.
+---
 
-### 🏍️ 2. Motocykle
-Dodawanie i zarządzanie wieloma motocyklami. Możliwość zapisania marki, modelu, rocznika, zdjęcia oraz aktualnego przebiegu lub motogodzin.
+## 🏁 v0.1 Alpha — 13.11.2026
+**Pierwsza wersja aplikacji**
 
-### 🔧 3. Serwis
-Historia napraw, wymian oleju, filtrów i innych czynności serwisowych. Kontrola terminów kolejnych przeglądów.
+### Główne funkcje
+- **Start** — ekran główny z podsumowaniem wybranego motocykla, przebiegiem, motogodzinami, serwisem i wydatkami.
+- **Moje motocykle** — lista motocykli z możliwością przechowywania ich danych technicznych, zdjęć i notatek.
+- **Historia serwisowa** — rejestrowanie napraw, przeglądów, wymian oleju, kosztów i stanów licznika.
+- **Wydatki** — ewidencja kosztów eksploatacji motocykli.
+- **Tory i miejscówki** — katalog miejsc do jazdy z opisami, zdjęciami i lokalizacjami.
 
-### 💰 4. Wydatki
-Rejestrowanie kosztów związanych z motocyklem, takich jak części, paliwo, naprawy i akcesoria.
+### Wygląd i personalizacja
+- Sześć motywów kolorystycznych.
+- Możliwość dodawania zdjęć motocykli.
+- Personalizacja wyglądu aplikacji.
+- Interfejs dostosowany do urządzeń mobilnych.
 
-### 📍 5. Tory i miejscówki
-Zapisywanie ulubionych tras, torów motocrossowych i miejsc do jazdy enduro. Możliwość dodawania lokalizacji, zdjęć oraz własnych opisów.
+### Techniczne
+- Utworzono projekt Android.
+- Dodano lokalne przechowywanie danych.
+- Skonfigurowano GitHub Actions do kompilacji APK.
+- Wygenerowano i zainstalowano pierwszą wersję testową.
 
-## 🎨 Personalizacja
-- Różne motywy kolorystyczne aplikacji.
-- Indywidualne zdjęcia motocykli.
-- Możliwość dostosowania wyglądu aplikacji.
+### Znane ograniczenia
+- Część przycisków dodawania i edycji nie reagowała.
+- W aplikacji znajdował się domyślny motocykl ASIX XR99.
 
-## 🚀 Historia wersji
+---
 
-**v0.1 Alpha — 13.11.2026**
-- Pierwsza wersja testowa projektu MotoGarage.
-- Przygotowanie pięciu głównych zakładek.
-- Konfiguracja projektu Android.
-- Konfiguracja kompilacji APK przez GitHub Actions.
+## 🔧 v0.2 Alpha — 13.11.2026
+**Naprawa formularzy i zarządzania motocyklami**
 
-**Status:** W trakcie testowania i rozwoju.
+### Poprawione funkcje
+- Naprawiono przycisk „Edytuj motocykl” na ekranie Start.
+- Naprawiono dodawanie i edycję motocykli w zakładce Moje motocykle.
+- Przywrócono działanie przycisków szybkich akcji na ekranie Start.
+- Naprawiono dodawanie wpisów w Historii serwisowej.
+- Naprawiono dodawanie wydatków.
+- Naprawiono dodawanie miejscówek.
 
-## 🔮 Plany rozwoju
-Dalsza rozbudowa funkcjonalności, poprawki błędów oraz aktualizacje na podstawie testów i sugestii użytkowników.
+### Zarządzanie motocyklami
+- Usunięto fabrycznie dodany motocykl ASIX XR99.
+- Nowy użytkownik rozpoczyna z pustą listą motocykli.
+- Umożliwiono usunięcie ostatniego motocykla z garażu.
+- Zachowano możliwość dodawania zdjęć oraz edytowania danych motocykla.
+
+### Techniczne
+- Usunięto konflikt w obsłudze formularzy JavaScript.
+- Zachowano lokalny mechanizm przechowywania danych.
+- Zaktualizowano numer wersji aplikacji.
+- Przeprowadzono testy instalacji i podstawowych formularzy na telefonie.
+
+---
+
+## 🚀 v0.3 Beta — 13.11.2026
+**Usprawnienia interfejsu i historii serwisowej**
+
+### Poprawki interfejsu
+- Zmieniono sposób pozycjonowania nagłówka względem systemowego paska Androida.
+- Dostosowano położenie logo, nazwy MotoGarage i przycisku ustawień.
+
+### Usprawnienia serwisu
+- Dodano automatyczne pobieranie aktualnego stanu motogodzin wybranego motocykla podczas tworzenia wpisu serwisowego.
+- Zachowano możliwość ręcznej edycji wartości motogodzin.
+- Uwzględniono zmianę motocykla podczas wypełniania formularza.
+
+### Techniczne
+- Przygotowano zmiany w kodzie aplikacji i konfiguracji Androida.
+- Zaktualizowano numer wersji do 0.3.
+- Przygotowano nową kompilację testową APK.
+
+**Status:** Wymaga końcowego potwierdzenia działania poprawek na telefonie.
+
+---
+
+## 📌 Planowane usprawnienia
+
+- Systemowe powiadomienia o zbliżającym się serwisie — odłożone na później.
+- Stały podpis APK umożliwiający aktualizację aplikacji bez odinstalowywania.
+- Automatyczne nazewnictwo plików instalacyjnych, np. `MotoGarage-v0.4.apk`.
+- Dalsze testy stabilności zapisu danych.
+- Rozbudowa funkcji na podstawie uwag użytkowników.
+
+---
+
+**Projekt MotoGarage — aplikacja rozwijana etapami, na podstawie testów na urządzeniach Android.**
