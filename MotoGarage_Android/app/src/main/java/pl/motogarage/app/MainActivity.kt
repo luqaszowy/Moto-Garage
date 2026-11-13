@@ -5,7 +5,11 @@ import android.os.Bundle
 import android.content.Intent
 import android.webkit.*
 import android.net.Uri
+import android.widget.FrameLayout
 import android.view.ViewGroup
+import android.view.View
+import android.view.WindowInsets
+import android.os.Build
 
 class MainActivity : Activity() {
     private lateinit var web: WebView
@@ -14,7 +18,27 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         web = WebView(this)
-        setContentView(web, ViewGroup.LayoutParams(-1,-1))
+        // Root view receives system-bar insets reliably, also on Android 15 edge-to-edge.
+        val container = FrameLayout(this)
+        container.addView(web, FrameLayout.LayoutParams(-1, -1))
+        container.setOnApplyWindowInsetsListener { view: View, insets: WindowInsets ->
+            val top: Int
+            val bottom: Int
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val bars = insets.getInsets(WindowInsets.Type.systemBars())
+                top = bars.top
+                bottom = bars.bottom
+            } else {
+                @Suppress("DEPRECATION")
+                top = insets.systemWindowInsetTop
+                @Suppress("DEPRECATION")
+                bottom = insets.systemWindowInsetBottom
+            }
+            view.setPadding(0, top, 0, bottom)
+            insets
+        }
+        setContentView(container, ViewGroup.LayoutParams(-1, -1))
+        container.requestApplyInsets()
         web.settings.javaScriptEnabled = true
         web.settings.domStorageEnabled = true
         web.settings.allowFileAccess = true
