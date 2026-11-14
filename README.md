@@ -2,7 +2,7 @@
 
 Aplikacja MotoGarage na Androida do zarządzania motocyklami, ich serwisem, wydatkami oraz ulubionymi torami i miejscówkami do jazdy.
 
-**Aktualna wersja: v0.3 Beta (w trakcie testów)**
+**Aktualna wersja: v0.3.4 Beta**
 
 ---
 
@@ -106,3 +106,11 @@ Aplikacja MotoGarage na Androida do zarządzania motocyklami, ich serwisem, wyda
 ---
 
 **Projekt MotoGarage — aplikacja rozwijana etapami, na podstawie testów na urządzeniach Android.**
+
+## v0.3.4 — 14.11.2026
+- Własna ikona crossa w zakładce Motocykle.
+- Spójny numer 0.3.4 w ustawieniach i konfiguracji APK (versionCode 5).
+- Przyciski Dodaj zdjęcie w stylu aplikacji we wszystkich polach wyboru zdjęć, także tła.
+- Nazwa wybranego pliku w formularzach.
+
+Weryfikacja: składnia JavaScript; test APK na telefonie pozostaje do wykonania.
