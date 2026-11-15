@@ -17,7 +17,7 @@ jobs:
         working-directory: MotoGarage_Android
 
     env:
-      ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/motogarage-release.jks
+      ANDROID_KEYSTORE_PATH: /tmp/motogarage-release.jks
       ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
       ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
       ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
