@@ -92,17 +92,6 @@ Aplikacja MotoGarage na Androida do zarządzania motocyklami, ich serwisem, wyda
 
 **Uwaga:** Numery 0.3.2 i 0.3.3 odnoszą się do kolejnych etapów poprawek. Numer wersji APK może nadal wynosić 0.3.1.
 
-
----
-
-## 📌 Planowane usprawnienia
-
-- Systemowe powiadomienia o zbliżającym się serwisie — odłożone na później.
-- Stały podpis APK umożliwiający aktualizację aplikacji bez odinstalowywania.
-- Automatyczne nazewnictwo plików instalacyjnych, np. `MotoGarage-v0.4.apk`.
-- Dalsze testy stabilności zapisu danych.
-- Rozbudowa funkcji na podstawie uwag użytkowników.
-
 ---
 
 **Projekt MotoGarage — aplikacja rozwijana etapami, na podstawie testów na urządzeniach Android.**
@@ -123,3 +112,12 @@ MotoGarage 0.3.5 — poprawki z 15.11.2026
 - Dodano walidację kopii i dokładniejsze komunikaty błędów importu.
 - Import wymaga potwierdzenia zastąpienia aktualnych danych.
 - Sprawdzono na telefonie: instalację jako aktualizacja, eksport pliku JSON i ponowny import zapisanej kopii.
+
+---
+
+## 📌 Planowane usprawnienia
+
+- Systemowe powiadomienia o zbliżającym się serwisie — odłożone na później.
+- Automatyczne nazewnictwo plików instalacyjnych, np. `MotoGarage-v0.4.apk`.
+- Dalsze testy stabilności zapisu danych.
+- Rozbudowa funkcji na podstawie uwag użytkowników.
