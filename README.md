@@ -114,3 +114,12 @@ Aplikacja MotoGarage na Androida do zarządzania motocyklami, ich serwisem, wyda
 - Nazwa wybranego pliku w formularzach.
 
 Weryfikacja: składnia JavaScript; test APK na telefonie pozostaje do wykonania.
+
+MotoGarage 0.3.5 — poprawki z 15.11.2026
+- Skonfigurowano podpisywanie APK stałym kluczem, umożliwiające instalowanie kolejnych wersji jako aktualizacji bez odinstalowywania aplikacji.
+- Dodano eksport kopii JSON przez systemowe okno Androida z wyborem miejsca zapisu.
+- Komunikat o zapisaniu kopii pojawia się dopiero po zakończeniu zapisu.
+- Naprawiono import kopii zapasowych — Android odczytuje teraz plik bezpośrednio, omijając problem pustej zawartości przekazywanej przez WebView.
+- Dodano walidację kopii i dokładniejsze komunikaty błędów importu.
+- Import wymaga potwierdzenia zastąpienia aktualnych danych.
+- Sprawdzono na telefonie: instalację jako aktualizacja, eksport pliku JSON i ponowny import zapisanej kopii.
