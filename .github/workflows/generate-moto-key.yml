@@ -1,0 +1,58 @@
+name: Utworz klucz MotoGarage
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  generate-key:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Zainstaluj Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Sprawdz hasla
+        env:
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ "${#STORE_PASSWORD}" -lt 6 ] || [ "${#KEY_PASSWORD}" -lt 6 ]; then
+            echo "::error::Dodaj sekrety ANDROID_KEYSTORE_PASSWORD i ANDROID_KEY_PASSWORD. Kazde haslo musi miec minimum 6 znakow."
+            exit 1
+          fi
+
+      - name: Wygeneruj klucz
+        env:
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          umask 077
+          mkdir -p signing
+
+          keytool -genkeypair \
+            -keystore signing/motogarage-release.jks \
+            -storetype JKS \
+            -storepass:env STORE_PASSWORD \
+            -keypass:env KEY_PASSWORD \
+            -alias motogarage \
+            -keyalg RSA \
+            -keysize 3072 \
+            -validity 10000 \
+            -dname "CN=MotoGarage, O=MotoGarage, C=PL"
+
+          base64 -w 0 signing/motogarage-release.jks \
+            > signing/ANDROID_KEYSTORE_BASE64.txt
+
+      - name: Udostepnij klucz do pobrania
+        uses: actions/upload-artifact@v4
+        with:
+          name: MotoGarage-klucz-ZACHOWAJ
+          path: signing/*
+          retention-days: 1
+          if-no-files-found: error
