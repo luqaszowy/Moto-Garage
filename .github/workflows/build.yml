@@ -1,4 +1,3 @@
-
 name: MotoGarage APK
 
 on:
@@ -6,13 +5,22 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     defaults:
       run:
-        working-directory: "MotoGarage_Android"
+        working-directory: MotoGarage_Android
+
+    env:
+      ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/motogarage-release.jks
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
     steps:
       - name: Pobierz projekt
@@ -32,12 +40,33 @@ jobs:
       - name: Przygotuj Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Zbuduj APK
-        run: gradle assembleDebug --no-daemon
+      - name: Odtworz staly klucz podpisu
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          set -euo pipefail
+          if [ -z "$KEYSTORE_BASE64" ] ||
+             [ -z "$ANDROID_KEYSTORE_PASSWORD" ] ||
+             [ -z "$ANDROID_KEY_ALIAS" ] ||
+             [ -z "$ANDROID_KEY_PASSWORD" ]; then
+            echo "::error::Brakuje sekretow podpisywania."
+            exit 1
+          fi
+
+          umask 077
+          printf '%s' "$KEYSTORE_BASE64" \
+            | base64 --decode > "$ANDROID_KEYSTORE_PATH"
+
+      - name: Zbuduj podpisane APK
+        run: gradle assembleRelease --no-daemon
 
       - name: Udostepnij APK
         uses: actions/upload-artifact@v4
         with:
-          name: MotoGarage-APK
-          path: "MotoGarage_Android/app/build/outputs/apk/debug/*.apk"
+          name: MotoGarage-APK-release
+          path: MotoGarage_Android/app/build/outputs/apk/release/*.apk
           if-no-files-found: error
+
+      - name: Usun tymczasowy klucz
+        if: always()
+        run: rm -f "$ANDROID_KEYSTORE_PATH"
