@@ -160,12 +160,3 @@ Sprawdzono logikę JavaScript: sześć ekranów w EN, wszystkie formularze, zapi
 - PL/EN i wybór waluty pozostają w projekcie. Aktualizacja nie usuwa danych aplikacji.
 - Android: versionCode 9, versionName 0.3.8.
 
-### Wgranie v0.3.8
-
-W głównym katalogu repozytorium wybierz Add file → Upload files i przeciągnij folder `MotoGarage_Android` z tej paczki oraz `README.md`. Zatwierdź zmiany; istniejący workflow zbuduje APK. Zainstaluj je jako aktualizację, bez odinstalowywania aplikacji.
-
-### Weryfikacja poprawki
-
-Sprawdzono strukturę kodu i brak pełnego JSON-a w zapisanym stanie; testy logiki PL/EN, walut i JSON pozostają poprawne. Nie wykonano tutaj kompilacji Androida ani testu cyklu życia na telefonie. Błąd zapisywania dużego stanu został znaleziony w kodzie; związek z konkretną awarią pozostaje hipotezą bez logcat.
-
-Na telefonie: wykonaj eksport istniejących danych ze zdjęciami do Pobranych. Poczekaj na komunikat zapisania kopii i sprawdź, że plik nie ma 0 bajtów. Przed zatwierdzeniem importu upewnij się, że wybrano nową kopię, po czym sprawdź motocykle, zdjęcia i walutę. Sprawdź również anulowanie zapisu. Jeśli awaria się powtórzy, potrzebny będzie logcat.
