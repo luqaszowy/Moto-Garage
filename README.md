@@ -121,3 +121,31 @@ MotoGarage 0.3.5 — poprawki z 15.11.2026
 - Automatyczne nazewnictwo plików instalacyjnych, np. `MotoGarage-v0.4.apk`.
 - Dalsze testy stabilności zapisu danych.
 - Rozbudowa funkcji na podstawie uwag użytkowników.
+
+
+## v0.3.6 — język polski i angielski
+
+- Przełącznik PL / EN w ustawieniach, zgodny z wyglądem aplikacji; aktywny przycisk używa koloru akcentu.
+- Automatyczny wybór języka przy pierwszym uruchomieniu: polski dla telefonu po polsku, angielski dla pozostałych języków. Ręczny wybór jest zapamiętywany.
+- Tłumaczenia ekranów, formularzy, przycisków, przypomnień, komunikatów oraz obsługi kopii zapasowych po stronie Androida.
+- Daty i kwoty formatowane według wybranego języka. Waluta nadal PLN; zmiana języka nie przelicza kwot.
+- Nazwy i notatki użytkownika pozostają w oryginale. Zgodność ze starszymi kopiami JSON; import nie zmienia wybranego języka.
+- Wersja Androida: `versionCode 7`, `versionName 0.3.6`. Stały podpis i identyfikator aplikacji zachowane.
+
+### Wgranie aktualizacji
+
+Zastąp w repozytorium trzy pliki: `MotoGarage_Android/app/src/main/assets/index.html`, `MotoGarage_Android/app/src/main/java/pl/motogarage/app/MainActivity.kt` oraz `MotoGarage_Android/app/build.gradle.kts`. Zaktualizuj również ten README. Istniejący workflow GitHub Actions buduje podpisane APK z dotychczasowymi sekretami.
+
+### Weryfikacja
+
+Sprawdzono logikę JavaScript: sześć ekranów w EN, wszystkie formularze, zapis danych, zachowanie nazw i notatek, stabilne wartości kategorii, daty, walutę, wybór języka i pamiętanie ustawienia oraz import poprawnej i błędnej kopii JSON. Środowisko testowe symulowało DOM i pamięć aplikacji; pełny test wizualny WebView i natywnych okien importu/eksportu wymaga telefonu. W tym środowisku nie zbudowano APK.
+
+
+## v0.3.7 — globalny wybór waluty
+
+- Przyciski PLN / EUR / USD / GBP w ustawieniach, zgodne ze stylem aplikacji.
+- Wybrana waluta dotyczy wszystkich kwot, historii, podsumowań i etykiet formularzy. Liczby pozostają bez zmian: 100 PLN po zmianie na EUR wyświetla się jako 100 EUR.
+- Ustawienie zapisuje się lokalnie i w kopii JSON (`settings.currency`). Import przywraca walutę; starsze kopie bez tego pola domyślnie używają PLN.
+- Język i walutę wybiera się niezależnie. Zgodnie z ustaleniem w interfejsie nie dodano podpowiedzi o przeliczaniu.
+- Android: `versionCode 8`, `versionName 0.3.7`. Zmiany względem v0.3.6 dotyczą `index.html`, `app/build.gradle.kts` i README; plik MainActivity.kt z v0.3.6 pozostaje wymagany dla pełnej obsługi PL/EN.
+- Testy logiki obejmują cztery waluty, zachowanie kwot, etykiety, zapis i odtworzenie ustawienia oraz import starszej kopii. APK nadal wymaga zbudowania i testu na telefonie.
