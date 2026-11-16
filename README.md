@@ -2,7 +2,7 @@
 
 Aplikacja MotoGarage na Androida do zarządzania motocyklami, ich serwisem, wydatkami oraz ulubionymi torami i miejscówkami do jazdy.
 
-**Aktualna wersja: v0.3.7 Beta**
+**Aktualna wersja: v0.3.8 Beta — poprawka eksportu, do testu na telefonie**
 
 ---
 
@@ -149,3 +149,23 @@ Sprawdzono logikę JavaScript: sześć ekranów w EN, wszystkie formularze, zapi
 - Język i walutę wybiera się niezależnie. Zgodnie z ustaleniem w interfejsie nie dodano podpowiedzi o przeliczaniu.
 - Android: `versionCode 8`, `versionName 0.3.7`. Zmiany względem v0.3.6 dotyczą `index.html`, `app/build.gradle.kts` i README; plik MainActivity.kt z v0.3.6 pozostaje wymagany dla pełnej obsługi PL/EN.
 - Testy logiki obejmują cztery waluty, zachowanie kwot, etykiety, zapis i odtworzenie ustawienia oraz import starszej kopii. APK nadal wymaga zbudowania i testu na telefonie.
+
+
+## v0.3.8 — poprawka awarii przy eksporcie
+
+- Usunięto zapisywanie całego JSON-a i zdjęć w `onSaveInstanceState`. Android dostaje tylko nazwę pliku roboczego, co usuwa znaną przyczynę przekroczenia rozmiaru zapisanego stanu.
+- Kopia powstaje w prywatnym pliku roboczym przed otwarciem wyboru miejsca zapisu. Przy odtworzeniu aktywności używana jest nazwa tego pliku.
+- Zapis do wybranej lokalizacji odbywa się strumieniowo poza głównym wątkiem. Komunikat sukcesu pojawia się po zamknięciu pliku oraz ponownym odczycie i porównaniu SHA-256.
+- Pusta kopia lub kopia większa niż obsługiwany przez import limit 32 MB nie jest przekazywana do okna zapisu. Anulowanie i zakończenie operacji sprzątają plik roboczy.
+- PL/EN i wybór waluty pozostają w projekcie. Aktualizacja nie usuwa danych aplikacji.
+- Android: versionCode 9, versionName 0.3.8.
+
+### Wgranie v0.3.8
+
+W głównym katalogu repozytorium wybierz Add file → Upload files i przeciągnij folder `MotoGarage_Android` z tej paczki oraz `README.md`. Zatwierdź zmiany; istniejący workflow zbuduje APK. Zainstaluj je jako aktualizację, bez odinstalowywania aplikacji.
+
+### Weryfikacja poprawki
+
+Sprawdzono strukturę kodu i brak pełnego JSON-a w zapisanym stanie; testy logiki PL/EN, walut i JSON pozostają poprawne. Nie wykonano tutaj kompilacji Androida ani testu cyklu życia na telefonie. Błąd zapisywania dużego stanu został znaleziony w kodzie; związek z konkretną awarią pozostaje hipotezą bez logcat.
+
+Na telefonie: wykonaj eksport istniejących danych ze zdjęciami do Pobranych. Poczekaj na komunikat zapisania kopii i sprawdź, że plik nie ma 0 bajtów. Przed zatwierdzeniem importu upewnij się, że wybrano nową kopię, po czym sprawdź motocykle, zdjęcia i walutę. Sprawdź również anulowanie zapisu. Jeśli awaria się powtórzy, potrzebny będzie logcat.
