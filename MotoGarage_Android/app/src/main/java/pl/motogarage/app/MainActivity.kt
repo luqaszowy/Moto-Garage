@@ -14,6 +14,8 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.security.MessageDigest
 
 class MainActivity : Activity() {
     private lateinit var web: WebView
@@ -21,7 +23,8 @@ class MainActivity : Activity() {
     private val pickCode = 107
     private val saveBackupCode = 108
     private val importBackupCode = 109
-    private var pendingBackup: String? = null
+    private var pendingBackupFile: File? = null
+    private var preparingBackup = false
     private var importOpen = false
     private val languagePrefs by lazy { getSharedPreferences("motogarage_language", MODE_PRIVATE) }
     @Volatile private var appLanguage = "en"
@@ -35,7 +38,14 @@ class MainActivity : Activity() {
         super.onCreate(savedInstanceState)
         appLanguage = languagePrefs.getString("language", null)
             ?: if (deviceLanguageTag().startsWith("pl")) "pl" else "en"
-        pendingBackup = savedInstanceState?.getString("pendingBackup")
+        // Only a small filename crosses the Android saved-state boundary, never JSON/photos.
+        savedInstanceState?.getString("pendingBackupFile")?.let { name ->
+            if (name.matches(Regex("backup-[A-Za-z0-9-]+\\.json"))) {
+                File(File(filesDir, "pending_exports"), name).takeIf { it.isFile }?.let {
+                    pendingBackupFile = it
+                }
+            }
+        }
         val dark = Color.rgb(16, 19, 24)
         window.statusBarColor = dark
         window.navigationBarColor = dark
@@ -135,23 +145,69 @@ class MainActivity : Activity() {
 
     @Suppress("DEPRECATION")
     private fun openBackupDestination(name: String, json: String) {
-        if (pendingBackup != null) {
+        if (preparingBackup || pendingBackupFile != null) {
             notifyUser(localized("Zakończ poprzedni zapis kopii.", "Finish saving the previous backup first."))
             return
         }
-        pendingBackup = json
+        preparingBackup = true
         val safeName = name.substringAfterLast('/').substringAfterLast('\\')
             .ifBlank { "MotoGarage_kopia.json" }
-        try {
-            startActivityForResult(Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
-                type = "application/json"
-                putExtra(Intent.EXTRA_TITLE, safeName)
-            }, saveBackupCode)
-        } catch (_: Exception) {
-            pendingBackup = null
-            notifyUser(localized("Nie można otworzyć okna zapisu kopii.", "Could not open the backup save dialog."))
+        Thread {
+            var staged: File? = null
+            try {
+                if (json.isBlank()) throw IllegalStateException(localized("Kopia jest pusta.", "The backup is empty."))
+                val dir = File(filesDir, "pending_exports")
+                if (!dir.isDirectory && !dir.mkdirs()) throw IllegalStateException("Cannot create export directory")
+                val file = File.createTempFile("backup-", ".json", dir)
+                staged = file
+                file.outputStream().use { output ->
+                    output.writer(Charsets.UTF_8).apply { write(json); flush() }
+                    output.fd.sync()
+                }
+                if (file.length() <= 0L || file.length() > 32L * 1024 * 1024) {
+                    throw IllegalStateException(localized("Kopia jest pusta lub przekracza limit 32 MB.", "The backup is empty or exceeds the 32 MB limit."))
+                }
+                runOnUiThread {
+                    preparingBackup = false
+                    if (isFinishing || isDestroyed) {
+                        file.delete()
+                    } else {
+                        pendingBackupFile = file
+                        try {
+                            startActivityForResult(Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                                addCategory(Intent.CATEGORY_OPENABLE)
+                                type = "application/json"
+                                putExtra(Intent.EXTRA_TITLE, safeName)
+                            }, saveBackupCode)
+                        } catch (_: Exception) {
+                            pendingBackupFile = null
+                            file.delete()
+                            notifyUser(localized("Nie można otworzyć okna zapisu kopii.", "Could not open the backup save dialog."))
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                staged?.delete()
+                runOnUiThread {
+                    preparingBackup = false
+                    notifyUser(localized("Nie udało się przygotować kopii: ${e.message}", "Could not prepare the backup: ${e.message}"))
+                }
+            }
+        }.start()
+    }
+
+    // Stream the verification as well, so photos are not loaded a second time into memory.
+    private fun digest(input: java.io.InputStream): ByteArray {
+        val hash = MessageDigest.getInstance("SHA-256")
+        input.use { stream ->
+            val buffer = ByteArray(8192)
+            while (true) {
+                val count = stream.read(buffer)
+                if (count < 0) break
+                if (count > 0) hash.update(buffer, 0, count)
+            }
         }
+        return hash.digest()
     }
 
     @Suppress("DEPRECATION")
@@ -176,7 +232,7 @@ class MainActivity : Activity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        pendingBackup?.let { outState.putString("pendingBackup", it) }
+        pendingBackupFile?.let { outState.putString("pendingBackupFile", it.name) }
         super.onSaveInstanceState(outState)
     }
 
@@ -189,25 +245,38 @@ class MainActivity : Activity() {
             return
         }
         if (requestCode == saveBackupCode) {
-            val json = pendingBackup
-            pendingBackup = null
+            val source = pendingBackupFile
+            pendingBackupFile = null
             if (resultCode != RESULT_OK) {
+                source?.delete()
                 notifyUser(localized("Anulowano zapis kopii.", "Backup save canceled."))
                 return
             }
             val uri = data?.data
-            if (uri == null || json == null) {
+            if (uri == null || source == null || !source.isFile || source.length() <= 0L) {
+                source?.delete()
                 notifyUser(localized("Nie udało się zapisać kopii. Spróbuj ponownie.", "Could not save the backup. Try again."))
                 return
             }
             Thread {
                 try {
+                    val expectedSize = source.length()
                     val output = contentResolver.openOutputStream(uri, "wt")
                         ?: throw IllegalStateException(localized("Brak dostępu do pliku", "Cannot access the file"))
-                    output.bufferedWriter(Charsets.UTF_8).use { it.write(json) }
+                    val written = output.use { destination ->
+                        source.inputStream().use { it.copyTo(destination) }
+                    }
+                    if (written != expectedSize) throw IllegalStateException("Incomplete backup write")
+                    val saved = contentResolver.openInputStream(uri)
+                        ?: throw IllegalStateException("Cannot verify saved backup")
+                    if (!digest(source.inputStream()).contentEquals(digest(saved))) {
+                        throw IllegalStateException(localized("Zapisany plik różni się od kopii.", "The saved file does not match the backup."))
+                    }
                     runOnUiThread { notifyUser(localized("Kopia zapasowa została zapisana.", "Backup saved.")) }
-                } catch (_: Exception) {
-                    runOnUiThread { notifyUser(localized("Nie udało się zapisać kopii.", "Could not save the backup.")) }
+                } catch (e: Exception) {
+                    runOnUiThread { notifyUser(localized("Nie udało się zapisać i zweryfikować kopii. Spróbuj ponownie. ${e.message}", "Could not save and verify the backup. Try again. ${e.message}")) }
+                } finally {
+                    source.delete()
                 }
             }.start()
             return
