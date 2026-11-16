@@ -23,10 +23,18 @@ class MainActivity : Activity() {
     private val importBackupCode = 109
     private var pendingBackup: String? = null
     private var importOpen = false
+    private val languagePrefs by lazy { getSharedPreferences("motogarage_language", MODE_PRIVATE) }
+    @Volatile private var appLanguage = "en"
+
+    private fun deviceLanguageTag(): String = resources.configuration.locales[0].language
+    private fun localized(pl: String, en: String): String = if (appLanguage == "pl") pl else en
+
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        appLanguage = languagePrefs.getString("language", null)
+            ?: if (deviceLanguageTag().startsWith("pl")) "pl" else "en"
         pendingBackup = savedInstanceState?.getString("pendingBackup")
         val dark = Color.rgb(16, 19, 24)
         window.statusBarColor = dark
@@ -76,7 +84,7 @@ class MainActivity : Activity() {
                 if (url.toString() == "file:///android_asset/index.html") return false
                 if (url.scheme == "https" || url.scheme == "geo") {
                     try { startActivity(Intent(Intent.ACTION_VIEW, url)) }
-                    catch (_: Exception) { notifyUser("Nie można otworzyć linku.") }
+                    catch (_: Exception) { notifyUser(localized("Nie można otworzyć linku.", "Could not open the link.")) }
                 }
                 return true
             }
@@ -107,6 +115,15 @@ class MainActivity : Activity() {
 
     inner class BackupBridge {
         @JavascriptInterface
+        fun deviceLanguage(): String = deviceLanguageTag()
+        @JavascriptInterface
+        fun setLanguage(language: String) {
+            if (language != "pl" && language != "en") return
+            appLanguage = language
+            languagePrefs.edit().putString("language", language).apply()
+        }
+
+        @JavascriptInterface
         fun saveBackup(name: String, json: String) {
             runOnUiThread { openBackupDestination(name, json) }
         }
@@ -119,7 +136,7 @@ class MainActivity : Activity() {
     @Suppress("DEPRECATION")
     private fun openBackupDestination(name: String, json: String) {
         if (pendingBackup != null) {
-            notifyUser("Zakończ poprzedni zapis kopii.")
+            notifyUser(localized("Zakończ poprzedni zapis kopii.", "Finish saving the previous backup first."))
             return
         }
         pendingBackup = json
@@ -133,7 +150,7 @@ class MainActivity : Activity() {
             }, saveBackupCode)
         } catch (_: Exception) {
             pendingBackup = null
-            notifyUser("Nie można otworzyć okna zapisu kopii.")
+            notifyUser(localized("Nie można otworzyć okna zapisu kopii.", "Could not open the backup save dialog."))
         }
     }
 
@@ -150,7 +167,7 @@ class MainActivity : Activity() {
             }, importBackupCode)
         } catch (_: Exception) {
             importOpen = false
-            notifyUser("Nie można otworzyć wyboru kopii.")
+            notifyUser(localized("Nie można otworzyć wyboru kopii.", "Could not open the backup picker."))
         }
     }
 
@@ -175,22 +192,22 @@ class MainActivity : Activity() {
             val json = pendingBackup
             pendingBackup = null
             if (resultCode != RESULT_OK) {
-                notifyUser("Anulowano zapis kopii.")
+                notifyUser(localized("Anulowano zapis kopii.", "Backup save canceled."))
                 return
             }
             val uri = data?.data
             if (uri == null || json == null) {
-                notifyUser("Nie udało się zapisać kopii. Spróbuj ponownie.")
+                notifyUser(localized("Nie udało się zapisać kopii. Spróbuj ponownie.", "Could not save the backup. Try again."))
                 return
             }
             Thread {
                 try {
                     val output = contentResolver.openOutputStream(uri, "wt")
-                        ?: throw IllegalStateException("Brak dostępu do pliku")
+                        ?: throw IllegalStateException(localized("Brak dostępu do pliku", "Cannot access the file"))
                     output.bufferedWriter(Charsets.UTF_8).use { it.write(json) }
-                    runOnUiThread { notifyUser("Kopia zapasowa została zapisana.") }
+                    runOnUiThread { notifyUser(localized("Kopia zapasowa została zapisana.", "Backup saved.")) }
                 } catch (_: Exception) {
-                    runOnUiThread { notifyUser("Nie udało się zapisać kopii.") }
+                    runOnUiThread { notifyUser(localized("Nie udało się zapisać kopii.", "Could not save the backup.")) }
                 }
             }.start()
             return
@@ -200,14 +217,14 @@ class MainActivity : Activity() {
             if (resultCode != RESULT_OK) return
             val uri = data?.data
             if (uri == null) {
-                notifyUser("Nie otrzymano wybranego pliku.")
+                notifyUser(localized("Nie otrzymano wybranego pliku.", "The selected file was not received."))
                 return
             }
             Thread {
                 try {
                     // Czytamy strumień, niezależnie od rozmiaru podanego przez dostawcę pliku.
                     val input = contentResolver.openInputStream(uri)
-                        ?: throw IllegalStateException("Brak dostępu do pliku")
+                        ?: throw IllegalStateException(localized("Brak dostępu do pliku", "Cannot access the file"))
                     val bytes = input.use { stream ->
                         val output = ByteArrayOutputStream()
                         val buffer = ByteArray(8192)
@@ -215,14 +232,14 @@ class MainActivity : Activity() {
                             val count = stream.read(buffer)
                             if (count < 0) break
                             if (output.size() + count > 32 * 1024 * 1024) {
-                                throw IllegalStateException("Kopia przekracza limit 32 MB")
+                                throw IllegalStateException(localized("Kopia przekracza limit 32 MB", "The backup exceeds the 32 MB limit"))
                             }
                             output.write(buffer, 0, count)
                         }
                         output.toByteArray()
                     }
                     val text = String(bytes, Charsets.UTF_8).removePrefix("\uFEFF").trim()
-                    if (text.isEmpty()) throw IllegalStateException("Android odczytał pusty plik")
+                    if (text.isEmpty()) throw IllegalStateException(localized("Android odczytał pusty plik", "Android read an empty file"))
                     JSONObject(text)
                     val quoted = JSONObject.quote(text)
                         .replace("\u2028", "\\u2028").replace("\u2029", "\\u2029")
@@ -232,7 +249,7 @@ class MainActivity : Activity() {
                         }
                     }
                 } catch (e: Exception) {
-                    runOnUiThread { notifyUser("Nie udało się odczytać kopii: ${e.message}") }
+                    runOnUiThread { notifyUser(localized("Nie udało się odczytać kopii: ${e.message}", "Could not read the backup: ${e.message}")) }
                 }
             }.start()
         }
